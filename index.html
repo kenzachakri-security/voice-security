@@ -1,165 +1,97 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>AI Smart Door Security</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Home Security</title>
 
-  <style>
-    body {
-      margin: 0;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: radial-gradient(circle at top, #141e30, #0f0c29);
-      font-family: 'Segoe UI', sans-serif;
-      color: white;
-    }
+<style>
+body {
+    margin:0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    color:white;
+}
 
-    .card {
-      background: rgba(255,255,255,0.05);
-      padding: 50px;
-      border-radius: 25px;
-      backdrop-filter: blur(15px);
-      box-shadow: 0 0 60px rgba(0,255,255,0.15);
-      text-align: center;
-      width: 90%;
-      max-width: 420px;
-      border: 1px solid rgba(0,255,255,0.2);
-    }
+.container {
+    text-align:center;
+    background: rgba(255,255,255,0.1);
+    padding:40px;
+    border-radius:20px;
+    backdrop-filter: blur(10px);
+}
 
-    h1 {
-      margin-bottom: 40px;
-    }
+h1 {
+    margin-bottom:30px;
+}
 
-    .mic-btn {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      border: none;
-      font-size: 28px;
-      cursor: pointer;
-      background: linear-gradient(145deg, #00f2fe, #4facfe);
-      color: white;
-      box-shadow: 0 0 30px rgba(0,242,254,0.6);
-      transition: 0.3s ease;
-    }
+button {
+    padding:15px 30px;
+    font-size:18px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    margin:10px;
+    transition:0.3s;
+}
 
-    .mic-btn:hover {
-      transform: scale(1.1);
-      box-shadow: 0 0 60px rgba(0,242,254,1);
-    }
+.voice-btn {
+    background:#00c6ff;
+    color:white;
+}
 
-    .listening {
-      animation: pulse 1s infinite;
-    }
+.voice-btn:hover {
+    background:#0072ff;
+}
 
-    @keyframes pulse {
-      0% { box-shadow: 0 0 20px #00f2fe; }
-      50% { box-shadow: 0 0 60px #00f2fe; }
-      100% { box-shadow: 0 0 20px #00f2fe; }
-    }
-
-    #status {
-      margin-top: 30px;
-      font-size: 18px;
-      min-height: 30px;
-    }
-
-    .success {
-      color: #00ff88;
-    }
-
-    .danger {
-      color: #ff4d4d;
-    }
-
-    .neutral {
-      color: #00f2fe;
-    }
-  </style>
+.status {
+    margin-top:20px;
+    font-size:18px;
+}
+</style>
 </head>
 
 <body>
 
-<div class="card">
-  <h1>🔐 AI Smart Door</h1>
-  <button class="mic-btn" id="startBtn">🎤</button>
-  <div id="status" class="neutral">
-    Say OPEN to unlock<br>
-    Say CLOSE to lock
-  </div>
+<div class="container">
+    <h1>🔐 Smart Home Security</h1>
+    <button class="voice-btn" onclick="startListening()">🎤 Start Voice Command</button>
+    <div class="status" id="status">Status: Waiting...</div>
 </div>
 
 <script>
+function startListening() {
 
-const btn = document.getElementById("startBtn");
-const statusText = document.getElementById("status");
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = "en-US";
 
-  
-const ESP_IP = "http://10.137.238.200";
-
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-if (!SpeechRecognition) {
-  statusText.innerHTML = "❌ Speech not supported";
-  statusText.className = "danger";
-} else {
-
-  const recognition = new SpeechRecognition();
-  recognition.lang = "en-US";
-  recognition.continuous = false;
-  recognition.interimResults = false;
-
-  btn.onclick = function() {
-    btn.classList.add("listening");
-    statusText.className = "neutral";
-    statusText.innerHTML = "🎧 Listening...";
     recognition.start();
 
-    setTimeout(() => {
-      recognition.stop();
-      btn.classList.remove("listening");
-    }, 4000);
-  };
+    recognition.onresult = function(event) {
 
-  recognition.onresult = function(event) {
+        let command = event.results[0][0].transcript.toLowerCase();
+        document.getElementById("status").innerHTML = "You said: " + command;
 
-    const command = event.results[0][0].transcript.toLowerCase();
-    statusText.innerHTML = "You said: " + command;
+        if(command.includes("open")) {
+            fetch("http://10.137.238.200/open");
+        }
 
-    if (command.includes("open")) {
-      fetch(ESP_IP + "/open")
-        .then(() => {
-          statusText.className = "success";
-          statusText.innerHTML += "<br>🚪 Door Opened";
-        })
-        .catch(() => {
-          statusText.className = "danger";
-          statusText.innerHTML += "<br>⚠ ESP32 not reachable";
-        });
-    }
+        else if(command.includes("close")) {
+            fetch("http://10.137.238.200/close");
+        }
 
-    if (command.includes("close")) {
-      fetch(ESP_IP + "/close")
-        .then(() => {
-          statusText.className = "success";
-          statusText.innerHTML += "<br>🔒 Door Closed";
-        })
-        .catch(() => {
-          statusText.className = "danger";
-          statusText.innerHTML += "<br>⚠ ESP32 not reachable";
-        });
-    }
-  };
+        else if(command.includes("arm")) {
+            fetch("http://10.137.238.200/arm");
+        }
 
-  recognition.onerror = function(event) {
-    statusText.className = "danger";
-    statusText.innerHTML = "Error: " + event.error;
-    btn.classList.remove("listening");
-  };
+        else if(command.includes("disarm")) {
+            fetch("http://10.137.238.200/disarm");
+        }
+    };
 }
-
 </script>
 
 </body>
