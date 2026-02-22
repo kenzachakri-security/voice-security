@@ -76,19 +76,19 @@ function startListening() {
         document.getElementById("status").innerHTML = "You said: " + command;
 
         if(command.includes("open")) {
-            fetch("http://10.137.238.200/open");
+            fetch("http://192.168.137.105/open");
         }
 
         else if(command.includes("close")) {
-            fetch("http://10.137.238.200/close");
+            fetch("http://192.168.137.105/close");
         }
 
         else if(command.includes("arm")) {
-            fetch("http://10.137.238.200/arm");
+            fetch("http://192.168.137.105/arm");
         }
 
         else if(command.includes("disarm")) {
-            fetch("http://10.137.238.200/disarm");
+            fetch("http://192.168.137.105/disarm");
         }
     };
 }
@@ -96,3 +96,4 @@ function startListening() {
 
 </body>
 </html>
+
