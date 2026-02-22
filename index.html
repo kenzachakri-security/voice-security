@@ -1,35 +1,53 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Voice Security Control</title>
+  <title>AI Home Security - Voice Control</title>
 </head>
-<body style="text-align:center; margin-top:50px;">
+<body style="text-align:center; margin-top:100px;">
 
-  <h2>AI Home Security - Voice Control</h2>
-  <button onclick="startRecognition()" style="font-size:20px; padding:10px;">
-    🎤 Start Voice Command
-  </button>
+<h2>AI Home Security - Voice Control</h2>
+<button id="startBtn">🎤 Start Voice Command</button>
 
-  <script>
-    function startRecognition() {
-      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-      recognition.lang = "en-US";
+<p id="status"></p>
 
-      recognition.start();
+<script>
 
-      recognition.onresult = function(event) {
-        let text = event.results[0][0].transcript.toLowerCase();
-        alert("You said: " + text);
+const btn = document.getElementById("startBtn");
+const statusText = document.getElementById("status");
 
-        if (text.includes("unlock")) {
-          fetch("http://10.137.238.200_ESP32/authorized");
-        } 
-        else if (text.includes("lock")) {
-          fetch("http://10.137.238.200_ESP32/unknown");
-        }
-      };
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+if (!SpeechRecognition) {
+  statusText.innerHTML = "❌ Speech Recognition not supported in this browser";
+} else {
+
+  const recognition = new SpeechRecognition();
+  recognition.lang = "en-US";
+
+  btn.onclick = function() {
+    recognition.start();
+    statusText.innerHTML = "🎧 Listening...";
+  };
+
+  recognition.onresult = function(event) {
+    const command = event.results[0][0].transcript.toLowerCase();
+    statusText.innerHTML = "You said: " + command;
+
+    if (command.includes("unlock")) {
+      fetch("http://10.137.238.200/authorized");
     }
-  </script>
+
+    if (command.includes("lock")) {
+      fetch("http://10.137.238.200/unknown");
+    }
+  };
+
+  recognition.onerror = function(event) {
+    statusText.innerHTML = "Error: " + event.error;
+  };
+}
+
+</script>
 
 </body>
 </html>
