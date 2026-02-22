@@ -1,15 +1,95 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>AI Home Security - Voice Control</title>
+  <title>AI Smart Security</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: radial-gradient(circle at top, #141e30, #0f0c29);
+      font-family: 'Segoe UI', sans-serif;
+      color: white;
+    }
+
+    .card {
+      background: rgba(255,255,255,0.05);
+      padding: 50px;
+      border-radius: 25px;
+      backdrop-filter: blur(15px);
+      box-shadow: 0 0 60px rgba(0,255,255,0.15);
+      text-align: center;
+      width: 90%;
+      max-width: 420px;
+      border: 1px solid rgba(0,255,255,0.2);
+    }
+
+    h1 {
+      font-weight: 600;
+      margin-bottom: 40px;
+      letter-spacing: 1px;
+    }
+
+    .mic-btn {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: none;
+      font-size: 28px;
+      cursor: pointer;
+      background: linear-gradient(145deg, #00f2fe, #4facfe);
+      color: white;
+      box-shadow: 0 0 30px rgba(0,242,254,0.6);
+      transition: 0.3s ease;
+    }
+
+    .mic-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 60px rgba(0,242,254,1);
+    }
+
+    .listening {
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 20px #00f2fe; }
+      50% { box-shadow: 0 0 60px #00f2fe; }
+      100% { box-shadow: 0 0 20px #00f2fe; }
+    }
+
+    #status {
+      margin-top: 30px;
+      font-size: 18px;
+      min-height: 30px;
+    }
+
+    .success {
+      color: #00ff88;
+    }
+
+    .danger {
+      color: #ff4d4d;
+    }
+
+    .neutral {
+      color: #00f2fe;
+    }
+
+  </style>
 </head>
 
-<body style="text-align:center; margin-top:100px;">
+<body>
 
-<h2>AI Home Security - Voice Control</h2>
-<button id="startBtn">🎤 Start Voice Command</button>
-
-<p id="status"></p>
+<div class="card">
+  <h1>🔐 AI Smart Security</h1>
+  <button class="mic-btn" id="startBtn">🎤</button>
+  <div id="status" class="neutral">Press mic & say START or STOP</div>
+</div>
 
 <script>
 
@@ -19,7 +99,8 @@ const statusText = document.getElementById("status");
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
 if (!SpeechRecognition) {
-  statusText.innerHTML = "❌ Speech Recognition not supported";
+  statusText.innerHTML = "❌ Speech not supported";
+  statusText.className = "danger";
 } else {
 
   const recognition = new SpeechRecognition();
@@ -28,34 +109,38 @@ if (!SpeechRecognition) {
   recognition.interimResults = false;
 
   btn.onclick = function() {
+    btn.classList.add("listening");
+    statusText.className = "neutral";
     statusText.innerHTML = "🎧 Listening...";
     recognition.start();
 
     setTimeout(() => {
       recognition.stop();
+      btn.classList.remove("listening");
     }, 4000);
   };
 
   recognition.onresult = function(event) {
-
     const command = event.results[0][0].transcript.toLowerCase();
     statusText.innerHTML = "You said: " + command;
 
-    // ===== START =====
     if (command.includes("start")) {
       fetch("http://10.137.238.200/authorized");
-      statusText.innerHTML += "<br>✅ START detected - LED ON";
+      statusText.className = "success";
+      statusText.innerHTML += "<br>✅ SYSTEM ACTIVATED";
     }
 
-    // ===== STOP =====
     if (command.includes("stop")) {
       fetch("http://10.137.238.200/unknown");
-      statusText.innerHTML += "<br>🔔 STOP detected - BUZZER ON";
+      statusText.className = "danger";
+      statusText.innerHTML += "<br>🚨 ALARM TRIGGERED";
     }
   };
 
   recognition.onerror = function(event) {
+    statusText.className = "danger";
     statusText.innerHTML = "Error: " + event.error;
+    btn.classList.remove("listening");
   };
 }
 
