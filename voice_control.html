@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Voice Security Control</title>
+</head>
+<body style="text-align:center; margin-top:50px;">
+
+  <h2>AI Home Security - Voice Control</h2>
+  <button onclick="startRecognition()" style="font-size:20px; padding:10px;">
+    🎤 Start Voice Command
+  </button>
+
+  <script>
+    function startRecognition() {
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = "en-US";
+
+      recognition.start();
+
+      recognition.onresult = function(event) {
+        let text = event.results[0][0].transcript.toLowerCase();
+        alert("You said: " + text);
+
+        if (text.includes("unlock")) {
+          fetch("http://10.137.238.200_ESP32/authorized");
+        } 
+        else if (text.includes("lock")) {
+          fetch("http://10.137.238.200_ESP32/unknown");
+        }
+      };
+    }
+  </script>
+
+</body>
+</html>
