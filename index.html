@@ -3,6 +3,7 @@
 <head>
   <title>AI Home Security - Voice Control</title>
 </head>
+
 <body style="text-align:center; margin-top:100px;">
 
 <h2>AI Home Security - Voice Control</h2>
@@ -18,27 +19,38 @@ const statusText = document.getElementById("status");
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
 if (!SpeechRecognition) {
-  statusText.innerHTML = "❌ Speech Recognition not supported in this browser";
+  statusText.innerHTML = "❌ Speech Recognition not supported";
 } else {
 
   const recognition = new SpeechRecognition();
   recognition.lang = "en-US";
+  recognition.continuous = false;
+  recognition.interimResults = false;
 
   btn.onclick = function() {
-    recognition.start();
     statusText.innerHTML = "🎧 Listening...";
+    recognition.start();
+
+    setTimeout(() => {
+      recognition.stop();
+    }, 4000);
   };
 
   recognition.onresult = function(event) {
+
     const command = event.results[0][0].transcript.toLowerCase();
     statusText.innerHTML = "You said: " + command;
 
-    if (command.includes("unlock")) {
+    // ===== START =====
+    if (command.includes("start")) {
       fetch("http://10.137.238.200/authorized");
+      statusText.innerHTML += "<br>✅ START detected - LED ON";
     }
 
-    if (command.includes("lock")) {
+    // ===== STOP =====
+    if (command.includes("stop")) {
       fetch("http://10.137.238.200/unknown");
+      statusText.innerHTML += "<br>🔔 STOP detected - BUZZER ON";
     }
   };
 
