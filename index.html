@@ -124,14 +124,14 @@ if (!SpeechRecognition) {
     const command = event.results[0][0].transcript.toLowerCase();
     statusText.innerHTML = "You said: " + command;
 
-    if (command.includes("start")) {
-      fetch("http://10.137.238.200/authorized");
+    if (command.includes("open")) {
+      fetch("http://10.137.238.200/open");
       statusText.className = "success";
       statusText.innerHTML += "<br>✅ SYSTEM ACTIVATED";
     }
 
-    if (command.includes("stop")) {
-      fetch("http://10.137.238.200/unknown");
+    if (command.includes("close")) {
+      fetch("http://10.137.238.200/close");
       statusText.className = "danger";
       statusText.innerHTML += "<br>🚨 ALARM TRIGGERED";
     }
@@ -148,3 +148,4 @@ if (!SpeechRecognition) {
 
 </body>
 </html>
+
