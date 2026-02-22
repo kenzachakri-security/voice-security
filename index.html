@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>AI Smart Security</title>
+  <title>AI Smart Door Security</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
@@ -29,9 +29,7 @@
     }
 
     h1 {
-      font-weight: 600;
       margin-bottom: 40px;
-      letter-spacing: 1px;
     }
 
     .mic-btn {
@@ -79,22 +77,27 @@
     .neutral {
       color: #00f2fe;
     }
-
   </style>
 </head>
 
 <body>
 
 <div class="card">
-  <h1>🔐 AI Smart Security</h1>
+  <h1>🔐 AI Smart Door</h1>
   <button class="mic-btn" id="startBtn">🎤</button>
-  <div id="status" class="neutral">Press mic & say START or STOP</div>
+  <div id="status" class="neutral">
+    Say OPEN to unlock<br>
+    Say CLOSE to lock
+  </div>
 </div>
 
 <script>
 
 const btn = document.getElementById("startBtn");
 const statusText = document.getElementById("status");
+
+  
+const ESP_IP = "http://10.137.238.200";
 
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
@@ -121,19 +124,32 @@ if (!SpeechRecognition) {
   };
 
   recognition.onresult = function(event) {
+
     const command = event.results[0][0].transcript.toLowerCase();
     statusText.innerHTML = "You said: " + command;
 
     if (command.includes("open")) {
-      fetch("http://10.137.238.200/open");
-      statusText.className = "success";
-      statusText.innerHTML += "<br>✅ SYSTEM ACTIVATED";
+      fetch(ESP_IP + "/open")
+        .then(() => {
+          statusText.className = "success";
+          statusText.innerHTML += "<br>🚪 Door Opened";
+        })
+        .catch(() => {
+          statusText.className = "danger";
+          statusText.innerHTML += "<br>⚠ ESP32 not reachable";
+        });
     }
 
     if (command.includes("close")) {
-      fetch("http://10.137.238.200/close");
-      statusText.className = "danger";
-      statusText.innerHTML += "<br>🚨 ALARM TRIGGERED";
+      fetch(ESP_IP + "/close")
+        .then(() => {
+          statusText.className = "success";
+          statusText.innerHTML += "<br>🔒 Door Closed";
+        })
+        .catch(() => {
+          statusText.className = "danger";
+          statusText.innerHTML += "<br>⚠ ESP32 not reachable";
+        });
     }
   };
 
@@ -148,4 +164,3 @@ if (!SpeechRecognition) {
 
 </body>
 </html>
-
