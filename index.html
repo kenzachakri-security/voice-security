@@ -5,51 +5,39 @@
 <title>Smart Home Security</title>
 
 <style>
-body {
-    margin:0;
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #1e3c72, #2a5298);
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
-    color:white;
+body{
+margin:0;
+font-family:Arial,sans-serif;
+background:linear-gradient(135deg,#1e3c72,#2a5298);
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+color:white;
 }
 
-.container {
-    text-align:center;
-    background: rgba(255,255,255,0.1);
-    padding:40px;
-    border-radius:20px;
-    backdrop-filter: blur(10px);
+.container{
+text-align:center;
+background:rgba(255,255,255,0.1);
+padding:40px;
+border-radius:20px;
+backdrop-filter:blur(10px);
 }
 
-h1 {
-    margin-bottom:30px;
+button{
+padding:15px 30px;
+font-size:18px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+margin:10px;
+background:#00c6ff;
+color:white;
 }
 
-button {
-    padding:15px 30px;
-    font-size:18px;
-    border:none;
-    border-radius:10px;
-    cursor:pointer;
-    margin:10px;
-    transition:0.3s;
-}
-
-.voice-btn {
-    background:#00c6ff;
-    color:white;
-}
-
-.voice-btn:hover {
-    background:#0072ff;
-}
-
-.status {
-    margin-top:20px;
-    font-size:18px;
+.status{
+margin-top:20px;
+font-size:18px;
 }
 </style>
 </head>
@@ -57,52 +45,54 @@ button {
 <body>
 
 <div class="container">
-    <h1>🔐 Smart Home Security</h1>
-    <button class="voice-btn" onclick="startListening()">🎤 Start Voice Command</button>
-    <div class="status" id="status">Status: Waiting...</div>
+<h1>🔐 Smart Home Security</h1>
+<button onclick="startListening()">🎤 Commande vocale</button>
+<div class="status" id="status">Statut : En attente...</div>
 </div>
 
 <script>
 
-const ESP_IP = "10.43.73.108";
+const ESP_IP="10.43.73.108";
 
-function startListening() {
+function startListening(){
 
-    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.lang = "en-US";
+const recognition=new(window.SpeechRecognition||window.webkitSpeechRecognition)();
 
-    recognition.start();
+recognition.lang="fr-FR";
 
-    recognition.onresult = function(event) {
+recognition.start();
 
-        let command = event.results[0][0].transcript.toLowerCase();
-        document.getElementById("status").innerHTML = "You said: " + command;
+recognition.onresult=function(event){
 
-        if(command.includes("open")) {
-            fetch(`http://${ESP_IP}/open`);
-        }
+let command=event.results[0][0].transcript.toLowerCase();
 
-        else if(command.includes("close")) {
-            fetch(`http://${ESP_IP}/close`);
-        }
+document.getElementById("status").innerHTML="Commande : "+command;
 
-        else if(command.includes("sleep")) {
-            fetch(`http://${ESP_IP}/sleep`);
-        }
-
-        else if(command.includes("wake")) {
-            fetch(`http://${ESP_IP}/wake`);
-        }
-    };
-
-    recognition.onerror = function() {
-        document.getElementById("status").innerHTML = "Voice Error!";
-    };
+if(command.includes("active les lumieres")){
+fetch(`http://${ESP_IP}/open`);
 }
+
+else if(command.includes("desactive les lumieres")){
+fetch(`http://${ESP_IP}/close`);
+}
+
+else if(command.includes("mets le systeme en veille")){
+fetch(`http://${ESP_IP}/sleep`);
+}
+
+else if(command.includes("active le systeme")){
+fetch(`http://${ESP_IP}/wake`);
+}
+
+};
+
+recognition.onerror=function(){
+document.getElementById("status").innerHTML="Erreur de reconnaissance";
+};
+
+}
+
 </script>
 
 </body>
 </html>
-
-
-
