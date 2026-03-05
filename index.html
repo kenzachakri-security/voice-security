@@ -4,7 +4,6 @@
 <head>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Smart Home Security</title>
 
 <style>
@@ -85,33 +84,58 @@ recognition.onresult=function(event){
 
 let command=event.results[0][0].transcript.toLowerCase();
 
-/* حذف accents */
+/* إزالة accents */
 
 command=command.normalize("NFD").replace(/[\u0300-\u036f]/g,"");
 
 document.getElementById("status").innerHTML="Commande : "+command;
 
-/* COMMANDES VOCALES */
 
-if(command.includes("active les lumieres")){
+/* ===== ALLUMER ===== */
+
+if(
+command.includes("active les lumieres") ||
+command.includes("allume les lumieres") ||
+command.includes("allume lumiere")
+){
 
 fetch(`http://${ESP_IP}/open`);
 
 }
 
-else if(command.includes("desactive les lumieres")){
+
+/* ===== ETEINDRE ===== */
+
+else if(
+command.includes("desactive les lumieres") ||
+command.includes("eteins les lumieres") ||
+command.includes("eteindre les lumieres") ||
+command.includes("eteins lumiere")
+){
 
 fetch(`http://${ESP_IP}/close`);
 
 }
 
-else if(command.includes("mets le systeme en veille")){
+
+/* ===== VEILLE ===== */
+
+else if(
+command.includes("mets le systeme en veille") ||
+command.includes("veille systeme")
+){
 
 fetch(`http://${ESP_IP}/sleep`);
 
 }
 
-else if(command.includes("active le systeme")){
+
+/* ===== ACTIVER ===== */
+
+else if(
+command.includes("active le systeme") ||
+command.includes("reveil systeme")
+){
 
 fetch(`http://${ESP_IP}/wake`);
 
@@ -119,9 +143,10 @@ fetch(`http://${ESP_IP}/wake`);
 
 };
 
+
 recognition.onerror=function(){
 
-document.getElementById("status").innerHTML="Erreur de reconnaissance vocale";
+document.getElementById("status").innerHTML="Erreur vocale";
 
 };
 
