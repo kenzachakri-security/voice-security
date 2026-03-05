@@ -2,14 +2,16 @@
 <html>
 
 <head>
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Smart Home Security</title>
 
 <style>
 
 body{
 margin:0;
-font-family:Arial,sans-serif;
+font-family:Arial;
 background:linear-gradient(135deg,#1e3c72,#2a5298);
 display:flex;
 justify-content:center;
@@ -36,16 +38,11 @@ font-size:18px;
 border:none;
 border-radius:10px;
 cursor:pointer;
-margin:10px;
-transition:0.3s;
-}
-
-.voice-btn{
 background:#00c6ff;
 color:white;
 }
 
-.voice-btn:hover{
+button:hover{
 background:#0072ff;
 }
 
@@ -55,6 +52,7 @@ font-size:18px;
 }
 
 </style>
+
 </head>
 
 <body>
@@ -63,12 +61,10 @@ font-size:18px;
 
 <h1>🔐 Smart Home Security</h1>
 
-<button class="voice-btn" onclick="startListening()">
-🎤 Start Voice Command
-</button>
+<button onclick="startListening()">🎤 Commande vocale</button>
 
 <div class="status" id="status">
-Status : Waiting...
+Statut : En attente...
 </div>
 
 </div>
@@ -125,7 +121,7 @@ fetch(`http://${ESP_IP}/wake`);
 
 recognition.onerror=function(){
 
-document.getElementById("status").innerHTML="Erreur vocale";
+document.getElementById("status").innerHTML="Erreur de reconnaissance vocale";
 
 };
 
@@ -134,4 +130,5 @@ document.getElementById("status").innerHTML="Erreur vocale";
 </script>
 
 </body>
+
 </html>
