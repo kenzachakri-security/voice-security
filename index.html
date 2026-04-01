@@ -75,17 +75,12 @@ const ESP_IP="172.20.10.3";
 function startListening(){
 
 const recognition=new(window.SpeechRecognition||window.webkitSpeechRecognition)();
-
 recognition.lang="fr-FR";
-
 recognition.start();
 
 recognition.onresult=function(event){
 
 let command=event.results[0][0].transcript.toLowerCase();
-
-/* إزالة accents */
-
 command=command.normalize("NFD").replace(/[\u0300-\u036f]/g,"");
 
 document.getElementById("status").innerHTML="Commande : "+command;
@@ -97,48 +92,33 @@ if(
 command.includes("active les lumieres") ||
 command.includes("allume les lumieres") ||
 command.includes("allume lumiere")
-){
-
-fetch(`http://${ESP_IP}/open`);
-
+)
+{
+ fetch(`http://${ESP_IP}/open`);
 }
-
-
 /* ===== ETEINDRE ===== */
-
 else if(
 command.includes("desactive les lumieres") ||
 command.includes("eteins les lumieres") ||
 command.includes("eteindre les lumieres") ||
 command.includes("eteins lumiere")
 ){
-
 fetch(`http://${ESP_IP}/close`);
-
 }
-
-
+  
 /* ===== VEILLE ===== */
-
 else if(
 command.includes("mets le systeme en veille") ||
 command.includes("veille systeme")
 ){
-
 fetch(`http://${ESP_IP}/sleep`);
-
 }
-
-
 /* ===== ACTIVER ===== */
-
 else if(
 command.includes("active le systeme") ||
 command.includes("reveil systeme")
 ){
-
 fetch(`http://${ESP_IP}/wake`);
-
 }
 
 };
